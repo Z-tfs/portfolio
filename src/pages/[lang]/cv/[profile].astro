@@ -1,0 +1,20 @@
+---
+// CV 排版页占位：不进导航，noindex，只用于生成 PDF（CLAUDE.md 第 7 节）。
+// 之后 profile 列表改为从 src/content/cv/profiles.yaml 读取。
+import Base from '../../../layouts/Base.astro';
+import { langs } from '../../../i18n/ui';
+import { getLang, t } from '../../../i18n/utils';
+
+export function getStaticPaths() {
+  const profiles = ['placeholder'];
+  return langs.flatMap((lang) => profiles.map((profile) => ({ params: { lang, profile } })));
+}
+
+const lang = getLang(Astro.params.lang);
+const { profile } = Astro.params;
+---
+
+<Base title={`CV — ${profile}`} noindex bare>
+  <p>{t('cv.placeholder', lang)}</p>
+  <p>profile: {profile}</p>
+</Base>

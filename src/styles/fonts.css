@@ -1,0 +1,8 @@
+/*
+  所有字体在这里一处声明（CLAUDE.md 第 8 节）。
+  - 标题、大字、导航：PP Neue York
+  - 正文、元数据、说明、表格：PP Editorial Sans
+  - Surprise Mode 故障部分：PP Lettra Mono
+  - 中文：待定（需子集化）
+  字体文件和 web license 确认后再加 @font-face。
+*/

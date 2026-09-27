@@ -1,0 +1,18 @@
+---
+/*
+  双语文字组件（用于作品正文里的长段文字，需在 .mdx 文件中使用）：
+  <Bi>
+    <Fragment slot="en">English text</Fragment>
+    <Fragment slot="zh">中文文字</Fragment>
+  </Bi>
+  缺当前语言时显示另一语言。
+*/
+import { getLang, otherLang } from '../i18n/utils';
+
+const lang = getLang(Astro.params.lang ?? Astro.currentLocale);
+const slot = Astro.slots.has(lang) ? lang : otherLang(lang);
+if (slot !== lang) console.warn(`[i18n] <Bi> 缺少 ${lang} 文字：${Astro.url.pathname}`);
+const html = await Astro.slots.render(slot);
+---
+
+<div class="bi" lang={slot === 'zh' ? 'zh-Hans' : 'en'} set:html={html} />

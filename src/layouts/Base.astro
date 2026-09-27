@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import { langs, defaultLang } from '../i18n/ui';
+import { getLang, switchLangPath, t } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  /** CV 排版页等不需要 Header 的页面 */
+  bare?: boolean;
+}
+
+const { title, description = '', noindex = false, bare = false } = Astro.props;
+const lang = getLang(Astro.params.lang ?? Astro.currentLocale);
+const siteTitle = t('site.title', lang);
+const pageTitle = title ? `${title} — ${siteTitle}` : siteTitle;
+const alternates = langs.map((l) => ({
+  lang: l,
+  href: new URL(switchLangPath(Astro.url.pathname, l), Astro.site).href,
+}));
+const xDefault = alternates.find((a) => a.lang === defaultLang)!.href;
+---
+
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-Hans' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang === 'zh' ? 'zh-Hans' : 'en'} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
+    <!-- Surprise Mode：在首帧前恢复本次会话的开关状态，避免闪烁 -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('mode') === 'surprise') {
+          document.documentElement.dataset.mode = 'surprise';
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    {!bare && <Header lang={lang} />}
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+---
+id: "002"
+title:
+  en: "Sample Project Two"
+year: 2024
+type: [motion]
+tools: [after-effects, figma]
+collaborators: ["Placeholder Person"]
+intro:
+  en: "Second placeholder project. It has no Chinese title, so the Chinese page falls back to English and the build shows a warning."
+  zh: "第二个占位项目。它没有中文标题，所以中文页会显示英文标题，并在构建时给出警告。"
+cover: ../../assets/work/sample-two/01.jpg
+---
+
+import Bi from '../../components/Bi.astro';
+
+![](../../assets/work/sample-two/01.jpg)
+
+<Bi>
+  <Fragment slot="en">A long bilingual paragraph inserted with the Bi component.</Fragment>
+  <Fragment slot="zh">用 Bi 组件插入的双语长段文字。</Fragment>
+</Bi>
