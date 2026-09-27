@@ -1,0 +1,95 @@
+---
+import { languages, langs, type Lang } from '../i18n/ui';
+import { t, url, switchLangPath } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<header class="site-header">
+  <a class="site-name" href={url(`${lang}/`)}>{t('site.name', lang)}</a>
+  <nav aria-label="Main">
+    <a href={url(`${lang}/#index`)}>→ {t('nav.index', lang)}</a>
+    <a href={url(`${lang}/info/`)}>→ {t('nav.info', lang)}</a>
+    <a href={url(`${lang}/info/#contact`)}>→ {t('nav.contact', lang)}</a>
+  </nav>
+  <nav class="lang-switch" aria-label={t('nav.lang', lang)}>
+    {
+      langs.map((l, i) => (
+        <>
+          {i > 0 && ' / '}
+          {l === lang ? (
+            <span aria-current="true">{languages[l]}</span>
+          ) : (
+            <a href={switchLangPath(Astro.url.pathname, l)} hreflang={l} lang={l}>
+              {languages[l]}
+            </a>
+          )}
+        </>
+      ))
+    }
+  </nav>
+  <button type="button" class="surprise-toggle" aria-pressed="false" data-surprise-toggle>
+    {t('nav.surprise', lang)}
+  </button>
+</header>
+
+<script>
+  // Surprise Mode 开关：只切换 <html data-mode="surprise">，状态保存在 sessionStorage。
+  const button = document.querySelector<HTMLButtonElement>('[data-surprise-toggle]');
+  const root = document.documentElement;
+  const sync = () => button?.setAttribute('aria-pressed', String(root.dataset.mode === 'surprise'));
+  sync();
+  button?.addEventListener('click', () => {
+    const on = root.dataset.mode !== 'surprise';
+    if (on) root.dataset.mode = 'surprise';
+    else delete root.dataset.mode;
+    try {
+      sessionStorage.setItem('mode', on ? 'surprise' : 'default');
+    } catch {}
+    sync();
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: baseline;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-name {
+    margin-right: auto;
+  }
+  nav {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .lang-switch {
+    gap: 0;
+  }
+  .lang-switch a {
+    text-decoration: none;
+    color: var(--text-2);
+  }
+  /* 当前语言：反色高亮 */
+  .lang-switch [aria-current] {
+    background: var(--invert-bg);
+    color: var(--invert-fg);
+  }
+  .surprise-toggle {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .surprise-toggle[aria-pressed='true'] {
+    background: var(--invert-bg);
+    color: var(--invert-fg);
+  }
+</style>

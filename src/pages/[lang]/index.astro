@@ -1,0 +1,107 @@
+---
+// Opening + Index（同一页）。Opening 目前只是静态占位，动态待定。
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { langs } from '../../i18n/ui';
+import { getLang, pick, t, typeLabel, toolLabel, url } from '../../i18n/utils';
+import { getWorks } from '../../lib/work';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLang(Astro.params.lang);
+const works = await getWorks();
+---
+
+<Base>
+  <section class="opening" aria-label="Opening">
+    <h1>{t('site.title', lang)}</h1>
+    <time data-clock></time>
+  </section>
+
+  <section id="index" class="index">
+    <!-- 控制面板占位：LIST / GRID、TYPE / TOOLS / YEAR 筛选，交互待做 -->
+    <table class="index-list">
+      <thead>
+        <tr>
+          <th scope="col">{t('index.col.id', lang)}</th>
+          <th scope="col">{t('index.col.title', lang)}</th>
+          <th scope="col" class="hide-mobile">{t('index.col.type', lang)}</th>
+          <th scope="col" class="hide-mobile">{t('index.col.tools', lang)}</th>
+          <th scope="col">{t('index.col.year', lang)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          works.map((w) => (
+            <tr>
+              <td>{w.data.id}</td>
+              <td>
+                <a href={url(`${lang}/work/${w.id}/`)}>{pick(w.data.title, lang, `${w.id} title`)}</a>
+              </td>
+              <td class="hide-mobile">{w.data.type.map((v) => typeLabel(v, lang)).join(', ')}</td>
+              <td class="hide-mobile">{w.data.tools.map((v) => toolLabel(v, lang)).join(', ')}</td>
+              <td>{w.data.year}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+
+    <!-- Grid 视图占位 -->
+    <ul class="index-grid" hidden>
+      {
+        works.map((w) => (
+          <li>
+            <a href={url(`${lang}/work/${w.id}/`)}>
+              {w.data.cover && <Image src={w.data.cover} alt="" widths={[400, 800]} sizes="25vw" />}
+              <span>{w.data.id}</span> <span>{pick(w.data.title, lang, `${w.id} title`)}</span> <span>{w.data.year}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>
+
+<script>
+  // Opening 占位：实时日期时间
+  const el = document.querySelector<HTMLTimeElement>('[data-clock]');
+  const tick = () => {
+    if (!el) return;
+    const now = new Date();
+    el.dateTime = now.toISOString();
+    el.textContent = now.toLocaleString(document.documentElement.lang);
+  };
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+<style>
+  /* Opening 占位占满一屏，向下滚动接上 Index */
+  .opening {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: var(--space-4) 0;
+  }
+  .index {
+    scroll-margin-top: var(--space-2);
+    min-height: 100vh;
+  }
+  .index-list {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .index-list th,
+  .index-list td {
+    text-align: left;
+    padding: var(--space-1) 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  @media (max-width: 640px) {
+    .hide-mobile {
+      display: none;
+    }
+  }
+</style>

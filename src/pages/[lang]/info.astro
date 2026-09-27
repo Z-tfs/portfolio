@@ -1,0 +1,23 @@
+---
+// Information 页占位。叙述式简介、精选经历、联系方式、CV 下载待做（CLAUDE.md 第 7 节）。
+import Base from '../../layouts/Base.astro';
+import { langs } from '../../i18n/ui';
+import { getLang, t } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = getLang(Astro.params.lang);
+---
+
+<Base title={t('nav.info', lang)}>
+  <h1>{t('nav.info', lang)}</h1>
+  <p>{t('info.placeholder', lang)}</p>
+  <section id="contact">
+    <h2>{t('info.contact', lang)}</h2>
+  </section>
+  <section id="cv">
+    <h2>{t('info.cv', lang)}</h2>
+  </section>
+</Base>

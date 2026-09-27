@@ -1,0 +1,34 @@
+@import './tokens.css';
+@import './fonts.css';
+
+/* 骨架阶段只做最基本的重置，不做视觉细节 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-text);
+}
+
+body {
+  margin: 0;
+  padding: var(--page-margin);
+}
+
+a {
+  color: inherit;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Surprise Mode 的效果只写在这个选择器下面（待设计） */
+html[data-mode='surprise'] {
+}

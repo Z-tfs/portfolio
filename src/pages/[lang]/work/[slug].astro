@@ -1,0 +1,105 @@
+---
+// 作品内页：项目头 + 元数据表 + 正文 + 上一个 / 下一个
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { langs } from '../../../i18n/ui';
+import { getLang, pick, t, typeLabel, toolLabel, url } from '../../../i18n/utils';
+import { getWorks } from '../../../lib/work';
+
+export async function getStaticPaths() {
+  const works = await getWorks();
+  return langs.flatMap((lang) =>
+    works.map((work, i) => ({
+      params: { lang, slug: work.id },
+      props: { work, prev: works[i - 1], next: works[i + 1] },
+    })),
+  );
+}
+
+const { work, prev, next } = Astro.props;
+const lang = getLang(Astro.params.lang);
+const d = work.data;
+const title = pick(d.title, lang, `${work.id} title`);
+const intro = pick(d.intro, lang, `${work.id} intro`);
+const recognition = pick(d.recognition, lang, `${work.id} recognition`);
+const { Content } = await render(work);
+
+// type / tools / year 链接回 index 并按该值筛选
+const filterLink = (key: string, value: string) =>
+  url(`${lang}/?${key}=${encodeURIComponent(value)}#index`);
+---
+
+<Base title={title} description={intro}>
+  <article>
+    <header class="project-head">
+      <h1>{title}</h1>
+      <p>{d.type.map((v) => typeLabel(v, lang)).join(', ')}</p>
+      <p>{intro}</p>
+    </header>
+
+    <dl class="meta">
+      <dt>{t('work.id', lang)}</dt>
+      <dd>{d.id}</dd>
+      <dt>{t('work.year', lang)}</dt>
+      <dd><a href={filterLink('year', d.year)}>{d.year}</a></dd>
+      <dt>{t('work.type', lang)}</dt>
+      <dd>
+        {d.type.map((v, i) => <>{i > 0 && ', '}<a href={filterLink('type', v)}>{typeLabel(v, lang)}</a></>)}
+      </dd>
+      <dt>{t('work.tools', lang)}</dt>
+      <dd>
+        {d.tools.map((v, i) => <>{i > 0 && ', '}<a href={filterLink('tools', v)}>{toolLabel(v, lang)}</a></>)}
+      </dd>
+      {d.dimensions && <><dt>{t('work.dimensions', lang)}</dt><dd>{d.dimensions}</dd></>}
+      {d.client && <><dt>{t('work.client', lang)}</dt><dd>{d.client}</dd></>}
+      {d.collaborators.length > 0 && <><dt>{t('work.collaborators', lang)}</dt><dd>{d.collaborators.join(', ')}</dd></>}
+      {recognition && <><dt>{t('work.recognition', lang)}</dt><dd class="pill">{recognition}</dd></>}
+    </dl>
+
+    <div class="body">
+      <Content />
+    </div>
+
+    <nav class="prev-next" aria-label="Work">
+      {prev && <a href={url(`${lang}/work/${prev.id}/`)} rel="prev">← {t('work.prev', lang)} {prev.data.id}</a>}
+      {next && <a href={url(`${lang}/work/${next.id}/`)} rel="next">{t('work.next', lang)} {next.data.id} →</a>}
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .project-head {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    gap: var(--grid-gutter);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-1) var(--space-2);
+    color: var(--text-2);
+  }
+  .meta dd {
+    margin: 0;
+  }
+  .pill {
+    justify-self: start;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 0 var(--space-1);
+  }
+  .prev-next {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-2);
+    margin-top: var(--space-4);
+  }
+  @media (max-width: 640px) {
+    .project-head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
