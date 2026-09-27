@@ -72,6 +72,15 @@ const { lang } = Astro.props;
   .lang-switch {
     gap: 0;
   }
+  .lang-switch a {
+    text-decoration: none;
+    color: var(--text-2);
+  }
+  /* 当前语言：反色高亮 */
+  .lang-switch [aria-current] {
+    background: var(--invert-bg);
+    color: var(--invert-fg);
+  }
   .surprise-toggle {
     font: inherit;
     color: inherit;

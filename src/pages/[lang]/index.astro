@@ -79,8 +79,15 @@ const works = await getWorks();
 </script>
 
 <style>
+  /* Opening 占位占满一屏，向下滚动接上 Index */
   .opening {
+    min-height: 100vh;
+    min-height: 100svh;
     padding: var(--space-4) 0;
+  }
+  .index {
+    scroll-margin-top: var(--space-2);
+    min-height: 100vh;
   }
   .index-list {
     width: 100%;
